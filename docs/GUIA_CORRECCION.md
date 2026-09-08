@@ -284,6 +284,77 @@ Prueba: al pulsar **Eliminar** debe desaparecer **solo** ese contacto.
 
 ---
 
+## Error 6 — La edad calculada está mal
+
+**Síntoma**
+Agregas un contacto con **Fecha de nacimiento**. En la lista aparece
+`X años`, pero el número no siempre es correcto: para alguien cuyo cumpleaños
+de este año **todavía no llega**, muestra **un año de más**.
+Ejemplo (hoy es 2026): nacido el `2000-12-31` debería tener 25, pero muestra 26.
+Nacido el `2000-01-01` sí sale bien.
+
+**Pistas para el diagnóstico**
+- Busca la función `calcularEdad(fechaNacimiento)` en `app.js`.
+- ¿Qué datos usa para calcular? ¿Solo el **año**, o también **mes y día**?
+- Escribe en la consola: con hoy `2026-09-08`, ¿cuánto da
+  `2026 - 2000` para alguien que cumple años en diciembre? ¿Ya cumplió?
+- Piensa: la edad baja en 1 si **este año todavía no ha pasado** su día de
+  cumpleaños.
+
+**Tu diagnóstico**:
+
+```
+_______________________________________________________________
+_______________________________________________________________
+```
+
+<details>
+<summary>Ver diagnóstico</summary>
+
+`calcularEdad` hace solo `hoy.getFullYear() - nacimiento.getFullYear()`, es
+decir **resta años sin mirar el mes ni el día**. Si la persona aún no ha
+cumplido años este año, esa resta da uno de más. Falta restar 1 cuando la fecha
+de hoy es **anterior** al cumpleaños de este año.
+</details>
+
+<details>
+<summary>Ver corrección</summary>
+
+En `js/app.js`, reemplaza la función:
+
+```js
+// ANTES
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const nacimiento = new Date(fechaNacimiento);
+  return hoy.getFullYear() - nacimiento.getFullYear();
+}
+
+// DESPUÉS
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const [anio, mes, dia] = fechaNacimiento.split("-").map(Number);
+
+  let edad = hoy.getFullYear() - anio;
+
+  const cumpleEsteAnio = new Date(hoy.getFullYear(), mes - 1, dia);
+  if (hoy < cumpleEsteAnio) {
+    edad = edad - 1;
+  }
+  return edad;
+}
+```
+
+Notas:
+- Se parte el texto `"AAAA-MM-DD"` con `split("-")` en lugar de
+  `new Date("...")` para evitar desfases de zona horaria de un día.
+- `mes - 1` porque en JavaScript los meses van de `0` (enero) a `11` (diciembre).
+
+Prueba con `2000-12-31` y con `2000-01-01`: ambos deben dar la edad real.
+</details>
+
+---
+
 ## Reto adicional — El buscador distingue mayúsculas de minúsculas
 
 **Síntoma**
@@ -341,6 +412,8 @@ Prueba: buscar `ana`, `ANA` o `Ana` debe dar el mismo resultado.
 - [ ] Agregar un contacto **no recarga** la página.
 - [ ] Los contactos **persisten** tras recargar.
 - [ ] **Eliminar** quita solo el contacto elegido.
+- [ ] La **edad** que se muestra coincide con la real (probar cumpleaños ya
+      pasado y aún por venir este año).
 - [ ] La búsqueda **ignora** mayúsculas/minúsculas.
 
 ## Resumen de los errores (para el docente)
@@ -352,4 +425,5 @@ Prueba: buscar `ana`, `ANA` o `Ana` debe dar el mismo resultado.
 | 3 | `app.js` | Variable `inputTel` no declarada (`inputTelefono`) | `ReferenceError`; nombres consistentes |
 | 4 | `app.js` | Clave de `localStorage` distinta al leer y escribir | Persistencia; usar una constante única |
 | 5 | `app.js` | `id` string (con comillas en `onclick`) vs. número; `!==` | Tipos en JS; comparación estricta |
+| 6 | `app.js` | `calcularEdad` resta solo años, ignora mes/día | Manejo de fechas; edad = años cumplidos, no diferencia de años |
 | R | `app.js` | `includes` sin `toLowerCase()` | Comparación de texto sin distinción de caso |

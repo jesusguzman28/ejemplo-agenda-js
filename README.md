@@ -6,12 +6,13 @@ corrección de errores**.
 
 La app *debería* permitir:
 
-- Registrar contactos (nombre, teléfono, correo).
+- Registrar contactos (nombre, teléfono, correo, fecha de nacimiento).
+- Mostrar la **edad** a partir de la fecha de nacimiento.
 - Listarlos y buscarlos por nombre.
 - Eliminar un contacto.
 - Conservar los datos al recargar la página (usa `localStorage`).
 
-> **Estado actual:** la aplicación **NO funciona correctamente**. Tiene 5 errores
+> **Estado actual:** la aplicación **NO funciona correctamente**. Tiene 6 errores
 > principales + 1 reto adicional. Tu trabajo es encontrarlos y arreglarlos.
 > Guía paso a paso: [`docs/GUIA_CORRECCION.md`](docs/GUIA_CORRECCION.md).
 
@@ -94,4 +95,5 @@ Instala la extensión **Live Server**, clic derecho sobre `index.html`
 - [ ] Puedo agregar un contacto y aparece en la lista **sin que la página se recargue**.
 - [ ] Si recargo la página, los contactos **siguen ahí**.
 - [ ] El botón **Eliminar** quita solo el contacto elegido.
+- [ ] La **edad** mostrada es la real, aunque el cumpleaños de este año aún no haya pasado.
 - [ ] El buscador filtra por nombre **aunque escriba en mayúsculas o minúsculas**.

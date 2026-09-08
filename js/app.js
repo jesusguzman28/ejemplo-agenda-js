@@ -11,6 +11,7 @@ const form = document.querySelector("#formulario");
 const inputNombre = document.querySelector("#nombre");
 const inputTelefono = document.querySelector("#telefono");
 const inputEmail = document.querySelector("#email");
+const inputNacimiento = document.querySelector("#nacimiento");
 const lista = document.querySelector("#lista-contactos");
 const buscador = document.querySelector("#buscador");
 
@@ -25,6 +26,7 @@ form.addEventListener("submit", function (evento) {
   const nombre = inputNombre.value.trim();
   const telefono = inputTel.value.trim();
   const email = inputEmail.value.trim();
+  const nacimiento = inputNacimiento.value;
 
   if (nombre === "" || telefono === "") {
     alert("El nombre y el teléfono son obligatorios.");
@@ -36,6 +38,7 @@ form.addEventListener("submit", function (evento) {
     nombre: nombre,
     telefono: telefono,
     email: email,
+    nacimiento: nacimiento,
   };
 
   contactos.push(nuevo);
@@ -71,6 +74,9 @@ function renderizar() {
 
   visibles.forEach(function (c) {
     const li = document.createElement("li");
+    const edad = c.nacimiento
+      ? " &middot; <span>" + calcularEdad(c.nacimiento) + " años</span>"
+      : "";
     li.innerHTML =
       "<div><strong>" +
       c.nombre +
@@ -78,12 +84,20 @@ function renderizar() {
       c.telefono +
       "</span> &middot; <span>" +
       (c.email || "&mdash;") +
-      "</span></div>" +
+      "</span>" +
+      edad +
+      "</div>" +
       '<button onclick="eliminarContacto(\'' +
       c.id +
       "')\">Eliminar</button>";
     lista.appendChild(li);
   });
+}
+
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const nacimiento = new Date(fechaNacimiento);
+  return hoy.getFullYear() - nacimiento.getFullYear();
 }
 
 function guardarContactos() {
