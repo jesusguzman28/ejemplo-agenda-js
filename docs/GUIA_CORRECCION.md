@@ -2,11 +2,11 @@
 
 > **Para qué es esta guía.** Ustedes se están formando para **gestionar la
 > calidad del software**: auditar sistemas ajenos y decidir si se liberan o no.
-> Los 6 errores de este proyecto son una excusa. Lo que se evalúa es que
-> ejecuten un **procedimiento** repetible: primero **detectar** los problemas,
-> luego **probar y revisar** para ubicarlos, después **diagnosticar** la causa y
-> recién al final **corregir**. Escribir el `fix` es el último paso y el menos
-> importante.
+> El **entregable** es `js/app.js` corregido y funcionando. Pero para llegar ahí
+> sin adivinar, sigan un **procedimiento** repetible: primero **detectar** los
+> problemas, luego **probar y revisar** para ubicarlos, después **diagnosticar**
+> la causa y recién al final **corregir**. Escribir el `fix` es el último paso;
+> lo que se practica es todo lo anterior.
 
 **Orden de lectura de esta guía:**
 
@@ -689,20 +689,14 @@ lo último que tocaste:
 - [ ] CU-6 — La **edad** coincide con la real (cumpleaños ya pasado y aún por venir).
 - [ ] A.4 — Ningún error ni *warning* nuevo en consola al operar.
 
-## Entregables del ejercicio
+## Entregable
 
-1. **Lista de hallazgos** `H-01…H-0n` (salida del Procedimiento A) con el guion
-   de pruebas A.2/A.3 lleno: dato usado, resultado esperado y obtenido.
-2. **Tabla de triage** (Procedimiento B): cada hallazgo con severidad, momento
-   en que ocurre y tipo de evidencia; ordenados por ataque.
-3. **Registro de defectos** (una fila por defecto, formato del instrumento de
-   registro): síntoma → defecto (`archivo:línea`) → causa raíz → corrección →
-   verificación (caso + regresión) → prevención → ISO/IEC 25010.
-4. **`js/app.js` corregido**, un commit por defecto:
-   `fix: <qué cambió> — causa raíz: <por qué pasó>`.
-5. **Media cuartilla de mejora de proceso:** de las 7 causas raíz, ¿qué **3
-   prácticas** (linter, revisión de código, pruebas automatizadas, convenciones,
-   prueba de humo) habrían evitado más de la mitad de los defectos? Justifica.
+**`js/app.js` corregido y funcionando**, que pasa todo el *Checklist de cierre*
+de arriba.
+
+Los Procedimientos A → D son **el camino** para llegar ahí (y lo que conviene
+practicar), pero no hay que entregar informes ni tablas: se evalúa el código
+corregido.
 
 ## Resumen para el docente
 

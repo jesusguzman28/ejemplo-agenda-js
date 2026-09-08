@@ -107,15 +107,11 @@ A → D**:
 6. **Procedimiento D**: corrige, vuelve a correr **todo el guion A.2** (no
    regresión) y registra causa raíz + prevención.
 
-### Entregables
+### Entregable
 
-1. **Lista de hallazgos** con el guion de pruebas lleno (Procedimiento A).
-2. **Tabla de triage** con severidades y orden de ataque (Procedimiento B).
-3. **Registro de defectos** (una fila por defecto): síntoma → defecto
-   (`archivo:línea`) → causa raíz → corrección → verificación → prevención → ISO/IEC 25010.
-4. **`js/app.js` corregido**, un commit por defecto (`fix: … — causa raíz: …`).
-5. **Media cuartilla:** qué 3 prácticas habrían evitado más de la mitad de los
-   defectos (ver la guía).
+**`js/app.js` corregido y funcionando**, que pasa el checklist de
+*"Cómo saber que quedó correcto"* (abajo). No se piden informes ni tablas: los
+Procedimientos A → D son el camino para llegar, no un entregable.
 
 ## Cómo saber que quedó correcto
 
