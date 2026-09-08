@@ -80,38 +80,53 @@ Instala la extensión **Live Server**, clic derecho sobre `index.html`
 
 ## Cómo trabajar el ejercicio
 
-No se evalúa que “arregles el código” (eso es lo fácil), sino que apliques
-**siempre el mismo método** para atacar un defecto y lo dejes **documentado**.
-Ese método está explicado en [`docs/GUIA_CORRECCION.md`](docs/GUIA_CORRECCION.md)
-→ sección *“Cómo atacar un defecto”* (ciclo Reproducir → Aislar → Hipótesis →
-Verificar → Corregir → Probar, distinción síntoma / defecto / causa raíz, y la
-**ficha de defecto** que llenas una por error).
+No se evalúa que “arregles el código” (es lo fácil), sino que ejecutes un
+**procedimiento repetible**: primero **detectar** los problemas, luego **probar
+y revisar** para ubicarlos, después **diagnosticar** la causa y solo al final
+**corregir**. Todo está en
+[`docs/GUIA_CORRECCION.md`](docs/GUIA_CORRECCION.md), en los **Procedimientos
+A → D**:
 
-1. Levanta el proyecto (arriba).
-2. Abre las **DevTools** con `F12` → pestaña **Console** (déjala abierta).
-3. Usa la app tratando de **reproducir** cada fallo a voluntad: agregar, recargar,
-   buscar, eliminar, poner fecha de nacimiento.
-4. Por cada fallo, empieza una **ficha de defecto** con los pasos exactos y la
-   evidencia (texto de consola, captura).
-5. Escribe **tu diagnóstico** (la causa, no el síntoma) **antes** de abrir el
-   bloque *“Ver diagnóstico”* de la guía; luego compara.
-6. Aplica la **corrección mínima**, y completa la ficha con *causa raíz* y
-   *prevención* (bloque *“Cierre del defecto”* de la guía).
-7. Vuelve a probar **toda** la lista del checklist, no solo lo último: un arreglo
-   puede romper otra cosa (no regresión).
+| | Procedimiento | Qué haces |
+|---|---|---|
+| **A** | Inspección y pruebas | Guion de casos de uso + pruebas de borde + barrido de consola/almacenamiento → **lista de hallazgos** |
+| **B** | Triage | Severidad de cada hallazgo + tabla “síntoma → dónde mirar” + orden de ataque |
+| **C** | Diagnóstico | Reproducir → aislar → instrumentar (`console.log`, breakpoints) → hipótesis → **verificarla con evidencia** |
+| **D** | Corrección y verificación | Cambio mínimo a la causa raíz → re-test del caso → **re-test de regresión** → registrar prevención → commit |
+
+**Flujo de una sesión:**
+
+1. Levanta el proyecto (arriba) en una ventana de **incógnito**.
+2. Abre **DevTools** (`F12`) → **Console** fija; ten a mano **Network** y
+   **Application → Local Storage**.
+3. Ejecuta el **Procedimiento A** entero **sin abrir `js/app.js`**: llena el
+   guion de pruebas y anota los hallazgos `H-01…`.
+4. Aplica el **Procedimiento B**: severidad y orden. Empieza por los bloqueantes.
+5. Por cada hallazgo, **Procedimiento C**: escribe **tu diagnóstico** (la causa,
+   no el síntoma) **antes** de abrir el bloque *“Ver diagnóstico”* de la guía.
+6. **Procedimiento D**: corrige, vuelve a correr **todo el guion A.2** (no
+   regresión) y registra causa raíz + prevención.
 
 ### Entregables
 
-1. **7 fichas de defecto** (6 errores + 1 reto).
-2. **`js/app.js` corregido**, un commit por defecto (`fix: … — causa raíz: …`).
-3. **Media cuartilla:** qué 3 prácticas habrían evitado más de la mitad de los
+1. **Lista de hallazgos** con el guion de pruebas lleno (Procedimiento A).
+2. **Tabla de triage** con severidades y orden de ataque (Procedimiento B).
+3. **Registro de defectos** (una fila por defecto): síntoma → defecto
+   (`archivo:línea`) → causa raíz → corrección → verificación → prevención → ISO/IEC 25010.
+4. **`js/app.js` corregido**, un commit por defecto (`fix: … — causa raíz: …`).
+5. **Media cuartilla:** qué 3 prácticas habrían evitado más de la mitad de los
    defectos (ver la guía).
 
 ## Cómo saber que quedó correcto
 
-- [ ] Al cargar la página no hay errores rojos en la consola.
-- [ ] Puedo agregar un contacto y aparece en la lista **sin que la página se recargue**.
-- [ ] Si recargo la página, los contactos **siguen ahí**.
-- [ ] El botón **Eliminar** quita solo el contacto elegido.
-- [ ] La **edad** mostrada es la real, aunque el cumpleaños de este año aún no haya pasado.
-- [ ] El buscador filtra por nombre **aunque escriba en mayúsculas o minúsculas**.
+Se da por cerrado cuando **todo el guion de pruebas del Procedimiento A.2**
+vuelve a pasar (checklist completo en `docs/GUIA_CORRECCION.md` → *“Checklist de
+cierre”*):
+
+- [ ] Sin errores rojos en consola al cargar ni al operar.
+- [ ] **CU-1** Agregar un contacto **no recarga** la página y aparece en la lista.
+- [ ] **CU-2** El alta sin teléfono se rechaza con aviso.
+- [ ] **CU-3** Los contactos **persisten** tras recargar (`F5`).
+- [ ] **CU-4** La búsqueda ignora mayúsculas/minúsculas.
+- [ ] **CU-5** **Eliminar** quita solo el contacto elegido (probar 1.º, 2.º y último).
+- [ ] **CU-6** La **edad** es la real, aunque el cumpleaños de este año aún no haya pasado.

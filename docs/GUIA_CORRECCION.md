@@ -3,88 +3,194 @@
 > **Para qué es esta guía.** Ustedes se están formando para **gestionar la
 > calidad del software**: auditar sistemas ajenos y decidir si se liberan o no.
 > Los 6 errores de este proyecto son una excusa. Lo que se evalúa es que
-> apliquen **siempre el mismo método** para atacar un defecto, y que lo dejen
-> **documentado**. Corregir el código es la parte fácil y la menos importante.
+> ejecuten un **procedimiento** repetible: primero **detectar** los problemas,
+> luego **probar y revisar** para ubicarlos, después **diagnosticar** la causa y
+> recién al final **corregir**. Escribir el `fix` es el último paso y el menos
+> importante.
 
-Para cada error verás:
+**Orden de lectura de esta guía:**
 
-1. **Síntoma** — lo que se observa al usar la app.
-2. **Pistas para el diagnóstico** — dónde mirar y qué preguntarte.
-3. **Tu diagnóstico** — escríbelo tú antes de seguir.
-4. **Diagnóstico** *(oculto)* — haz clic en el triángulo para revelarlo y compararlo.
-5. **Corrección** *(oculto)* — el cambio exacto en `js/app.js`.
-6. **Cierre del defecto** *(oculto)* — severidad, causa raíz, prevención y la
-   característica ISO/IEC 25010 afectada.
+1. Primero los **Procedimientos A → D** de abajo. Son el método; se aplican a
+   este proyecto y a cualquier sistema que audites.
+2. Luego, cada **Error 1 → 6 + Reto**. Cada uno trae:
+   - **Síntoma** — lo que debiste detectar en el **Procedimiento A**.
+   - **Pistas para el diagnóstico** — cómo aislar la causa (**Procedimiento C**).
+   - **Tu diagnóstico** — lo escribes tú **antes** de abrir nada.
+   - **Diagnóstico** *(oculto)* — para contrastar con el tuyo.
+   - **Corrección** *(oculto)* — el cambio exacto en `js/app.js` (**Proc. D**).
+   - **Cierre del defecto** *(oculto)* — severidad, causa raíz, prevención,
+     característica ISO/IEC 25010.
 
-> Regla del ejercicio: **no abras “Diagnóstico” hasta haber escrito el tuyo.**
-> Trabaja los errores **en orden** (1 → 6): cada arreglo destapa el siguiente.
-> El Error 6 es independiente, pero se nota recién cuando ya puedes agregar
-> contactos.
+> Reglas: **no abras “Diagnóstico” hasta haber escrito el tuyo.** Trabaja los
+> errores **en orden** (1 → 6): cada arreglo destapa el siguiente. El Error 6 es
+> independiente, pero se nota recién cuando ya puedes agregar contactos.
 
 ---
 
-## Cómo atacar un defecto — el método (esto es lo que de verdad se transfiere)
+## El método: cuatro procedimientos, siempre en este orden
 
-### El ciclo: Reproducir → Aislar → Hipótesis → Verificar → Corregir → Probar
+No se toca el código hasta el Procedimiento C.
 
-1. **Reproducir.** Consigue que el fallo ocurra *a voluntad*. Anota pasos
-   exactos, datos usados y entorno (navegador y versión). Un defecto que no se
-   reproduce no se puede corregir ni verificar.
-2. **Aislar.** ¿Falla al cargar o al interactuar? ¿Lo dispara un dato concreto?
-   ¿Qué función o línea? Herramientas: consola (`F12`), pestaña **Network**,
-   pestaña **Application → Local Storage**, `console.log` y *breakpoints*.
-3. **Hipótesis.** Escribe **una** causa probable en una frase, en términos de
-   *causa*, no de *síntoma*: “el selector no encuentra el elemento”, no “no
-   funciona el botón”.
-4. **Verificar la hipótesis** *antes* de tocar código: un `console.log`, mirar
-   el `id` real en el HTML, comparar tipos con `typeof`. Si la evidencia no la
-   confirma, vuelve al paso 2.
-5. **Corregir** con el cambio **mínimo** que ataca la **causa raíz**, no el
-   síntoma.
-6. **Probar de nuevo:** *confirmación* (el caso que fallaba ahora pasa) **y**
-   *no regresión* (lo que ya funcionaba sigue funcionando). Repasa el checklist
-   final.
+| | Procedimiento | Pregunta que responde | Producto que deja |
+|---|---|---|---|
+| **A** | Inspección y pruebas | ¿Qué falla? ¿cuándo y con qué datos? | Lista de hallazgos `H-01…H-0n` |
+| **B** | Triage | ¿Qué tan grave? ¿por dónde empiezo? | Hallazgos priorizados por severidad |
+| **C** | Diagnóstico | ¿Cuál es la **causa**, no el síntoma? | Causa confirmada con evidencia |
+| **D** | Corrección y verificación | ¿Quedó, sin romper nada más? | Defecto cerrado + medida de prevención |
 
-### Síntoma ≠ Defecto ≠ Causa raíz
+---
 
-- **Síntoma:** lo que ve el usuario — “los contactos desaparecen al recargar”.
-- **Defecto:** el error concreto en el código — la clave de `localStorage` al
-  leer no coincide con la de escribir.
-- **Causa raíz:** por qué se coló — una cadena literal repetida en dos lugares
-  en vez de una constante única — y qué práctica lo habría evitado.
+## Procedimiento A — Inspección y pruebas (identificar los problemas)
 
-Corriges el **defecto**; tu valor como gestor de calidad está en identificar y
-atacar la **causa raíz** para que esa *clase* de defecto no reaparezca.
+> Objetivo: encontrar **todos** los síntomas **antes** de abrir `js/app.js`.
+> Trabaja como si no pudieras ver el código.
 
-### Ficha de defecto (llena una por cada error y entrégalas)
+### A.0 — Preparar el entorno de prueba
+1. Abre el proyecto en una **ventana de incógnito** (estado limpio, sin
+   `localStorage` de intentos previos).
+2. Abre **DevTools** (`F12`) y deja fija la pestaña **Console**.
+3. Ubica también **Network** y **Application → Local Storage**.
+4. Anota navegador y versión (`chrome://version`): es parte de la evidencia.
 
-| Campo | Contenido |
+### A.1 — Prueba de humo (¿arranca?)
+1. Carga la página.
+2. Lee la **Console** de arriba abajo. ¿Hay texto **rojo**? Cópialo completo
+   (mensaje + `archivo:línea`) → es un hallazgo.
+3. Verifica que se ven los tres bloques: título, formulario y lista.
+4. Si la app **no** arranca, sigue igualmente con los demás pasos anotando
+   “no evaluable por H-01”; el hallazgo de humo queda como prioridad máxima.
+
+### A.2 — Recorrido de casos de uso (guion de prueba)
+Ejecuta cada fila **en orden**, con el dato indicado, y completa las dos últimas
+columnas:
+
+| # | Caso de uso | Pasos | Dato de prueba | Resultado esperado | Obtenido | ¿Defecto? |
+|---|---|---|---|---|---|---|
+| CU-1 | Alta de contacto | Llenar nombre + teléfono → **Agregar** | `Ana Torres` / `987654321` | Aparece en la lista; el formulario se limpia; la página **no** recarga | | |
+| CU-2 | Alta sin obligatorios | Dejar teléfono vacío → **Agregar** | nombre `X`, teléfono vacío | Aviso de validación; no se agrega | | |
+| CU-3 | Persistencia | Agregar 2 contactos → `F5` | — | Los 2 siguen en la lista | | |
+| CU-4 | Búsqueda | Escribir en el buscador | `ana` (minúsculas) | Muestra “Ana Torres” | | |
+| CU-5 | Eliminar | **Eliminar** en el 2.º de 3 contactos | 3 contactos cargados | Desaparece **solo** ese; quedan 2 | | |
+| CU-6 | Edad | Alta con fecha de nacimiento | nacimiento `2000-12-31` | Muestra la edad real (años cumplidos **hoy**) | | |
+
+Regla: **un** resultado obtenido por celda, objetivo y observable
+(“la URL cambió a `index.html?nombre=...`”), nunca una interpretación
+(“parece que no guarda”).
+
+### A.3 — Pruebas de borde (datos límite)
+- CU-6 otra vez con: `2000-01-01`, una fecha del **mes que viene**, `2000-02-29`.
+- CU-4 otra vez con: `ANA`, `  ana  ` (con espacios), con acento `á`.
+- CU-5 eliminando el **primero** y luego el **último** de la lista.
+
+Cualquier diferencia de comportamiento = hallazgo aparte.
+
+### A.4 — Barrido técnico
+1. **Console:** repite las acciones con la Console visible. Todo error o
+   *warning* que aparezca **al actuar** es un hallazgo, aunque la interfaz
+   “parezca” funcionar.
+2. **Application → Local Storage:** tras agregar, ¿se creó una clave?, ¿cómo se
+   llama?, ¿contiene los datos? Compárala con lo que esperabas.
+3. **Network:** al pulsar **Agregar**, ¿se dispara una recarga del documento?
+   No debería.
+
+### A.5 — Salida del Procedimiento A
+Una **lista de hallazgos numerada**. Un hallazgo = una línea:
+
+```
+H-03 | CU-3 | Al recargar (F5) la lista queda vacía | evidencia: en Local Storage solo existe la clave "agenda:contactos"
+```
+
+---
+
+## Procedimiento B — Triage (priorizar y ubicar)
+
+Para cada hallazgo:
+
+1. **¿Impide usar el sistema?** → asigna **severidad**:
+   - Todo el sistema inutilizable → **Bloqueante**
+   - Un caso de uso central roto (alta, guardar, eliminar) → **Alta**
+   - Función secundaria, o un dato que se muestra mal → **Media**
+   - Molestia con vía alterna → **Baja**
+2. **¿Cuándo ocurre?** al cargar / al enviar el formulario / al pintar la lista
+   / al eliminar / solo con ciertos datos. Esto ya acota la zona del código.
+3. **¿Hay evidencia dura?** un error de consola con `archivo:línea` (vas casi
+   directo) o solo comportamiento (habrá que instrumentar en el Proc. C).
+
+**Orden de ataque:** primero los **Bloqueantes** (tapan al resto), luego por
+severidad. Si un hallazgo tapa a otro, decláralo y sigue.
+
+**Tabla de triage — síntoma → primer lugar donde mirar:**
+
+| Síntoma observado | Primer lugar a revisar |
 |---|---|
-| ID | DEF-01 |
-| Título | (una línea) |
-| Severidad | Bloqueante / Alta / Media / Baja |
-| Cómo reproducir | pasos 1, 2, 3… + datos usados |
-| Resultado esperado | |
-| Resultado obtenido | con evidencia: texto de consola o captura |
-| Componente / línea | `js/app.js:NN` |
-| Defecto (causa técnica) | |
-| Causa raíz | |
-| Corrección aplicada | qué cambiaste y por qué es el cambio mínimo |
-| Verificación | cómo comprobaste que quedó + prueba de no regresión |
-| Prevención | linter / revisión / prueba / convención que lo evita |
-| ISO/IEC 25010 afectada | Adecuación funcional, Fiabilidad, Usabilidad… |
-
-> Las 7 fichas (6 errores + reto) son el entregable que demuestra el **método**,
-> no solo el resultado.
+| Error rojo **al cargar** | La línea `archivo:línea` del error. ¿Un `querySelector` devolvió `null`? |
+| La **URL cambia** / la página recarga al enviar | Manejador `submit`: ¿falta `preventDefault()`? |
+| Error rojo **al pulsar** un control | La función que ejecuta ese control; nombres de variables |
+| “Se ve” pero **no persiste** al recargar | `localStorage`: clave de escritura vs. clave de lectura |
+| Acción **sin efecto** y **sin** error en consola | Comparaciones (`===` / `!==`), tipos (`typeof`), condiciones invertidas |
+| Un **dato mostrado** es incorrecto | La función que calcula ese dato; probar casos borde |
 
 ---
 
-### Preparación
+## Procedimiento C — Diagnóstico (aislar y confirmar la causa)
 
-- Levanta el proyecto (ver `README.md`).
-- Abre DevTools con `F12` → pestaña **Console**. Déjala abierta todo el tiempo.
-- Ten a la vista `js/app.js` en tu editor.
-- Ten a mano la plantilla de **ficha de defecto** (arriba) para ir llenándola.
+Por cada hallazgo priorizado, en orden:
+
+1. **Reproducir a voluntad.** Escribe la secuencia mínima que provoca el fallo
+   el 100 % de las veces. Si es intermitente, halla qué lo vuelve determinista
+   (un dato, un orden). Sin esto no se avanza.
+2. **Reducir el alcance.** ¿Es de *carga* o de *interacción*? ¿Depende del dato?
+   Quita variables hasta quedarte con el mínimo que aún falla.
+3. **Instrumentar** (mirar, sin cambiar la lógica todavía):
+   - `console.log(valor, typeof valor)` antes de la línea sospechosa.
+   - *Breakpoint* en la pestaña **Sources** y avanzar paso a paso.
+   - Comparar el HTML real del elemento contra el selector que usa el JS.
+4. **Formular la hipótesis** en **una frase de causa**: “la función lee `X`, que
+   nunca se declara” — no “el botón no anda”.
+5. **Verificar la hipótesis con evidencia** *antes* de corregir. Si el
+   `console.log` / breakpoint / HTML no la confirma → vuelve al paso 2 con otra
+   hipótesis.
+6. **Nombrar los tres niveles:**
+   - *Síntoma:* lo que ve el usuario.
+   - *Defecto:* la línea concreta que está mal (`archivo:línea`).
+   - *Causa raíz:* por qué se coló — qué práctica faltó.
+
+Solo con la causa **confirmada** pasas al Procedimiento D.
+
+---
+
+## Procedimiento D — Corrección y verificación
+
+1. **Cambio mínimo** que ataca la **causa raíz**, no el síntoma. Sin parches
+   alrededor del problema.
+2. **Re-test del caso:** el `CU-n` que fallaba ahora pasa.
+3. **Re-test de regresión:** vuelve a ejecutar **todo el Procedimiento A.2**.
+   Un arreglo puede romper otra cosa.
+4. **Registrar el cierre:** causa raíz + medida de prevención (linter, revisión
+   de código, prueba automatizada, convención, prueba de humo…).
+5. **Commit** por defecto: `fix: <qué cambió> — causa raíz: <por qué pasó>`.
+
+---
+
+### Instrumento de registro (apoyo, no el objetivo)
+
+Para no perder trazabilidad, vuelca cada defecto en una fila:
+
+```
+ID | Severidad | CU | Síntoma | Defecto (archivo:línea) | Causa raíz | Corrección | Verificación (caso + regresión) | Prevención | ISO/IEC 25010
+```
+
+> El registro **documenta** que ejecutaste A → D; no lo reemplaza. Una tabla
+> llena sin haber corrido los procedimientos no vale.
+
+---
+
+## Los 6 errores + reto
+
+De aquí en adelante, **cada error es un hallazgo del Procedimiento A**. El
+apartado *Síntoma* es lo que debiste observar en A.2; *Pistas* te guía en el
+Procedimiento C; *Corrección* y *Cierre* corresponden al D. Escribe **tu
+diagnóstico** antes de abrir los bloques ocultos.
 
 ---
 
@@ -569,27 +675,34 @@ Prueba: buscar `ana`, `ANA` o `Ana` debe dar el mismo resultado.
 
 ---
 
-## Checklist final (confirmación + no regresión)
+## Checklist de cierre (Procedimiento A.2 completo, como regresión)
 
-Tras corregir **todos**, vuelve a verificar la lista completa, no solo el último
-arreglo:
+Tras corregir **todos**, ejecuta otra vez el guion de pruebas completo, no solo
+lo último que tocaste:
 
-- [ ] La consola no muestra errores rojos al cargar.
-- [ ] Agregar un contacto **no recarga** la página.
-- [ ] El contacto agregado aparece en la lista.
-- [ ] Los contactos **persisten** tras recargar (`F5`).
-- [ ] **Eliminar** quita solo el contacto elegido.
-- [ ] La **edad** coincide con la real (probar cumpleaños ya pasado y aún por venir).
-- [ ] La búsqueda **ignora** mayúsculas/minúsculas.
+- [ ] A.1 — La consola no muestra errores rojos al cargar.
+- [ ] CU-1 — Agregar un contacto **no recarga** la página y aparece en la lista.
+- [ ] CU-2 — El alta sin teléfono se rechaza con aviso.
+- [ ] CU-3 — Los contactos **persisten** tras recargar (`F5`).
+- [ ] CU-4 — La búsqueda **ignora** mayúsculas/minúsculas (`ana`, `ANA`, `Ana`).
+- [ ] CU-5 — **Eliminar** quita solo el contacto elegido (probar 1.º, 2.º y último).
+- [ ] CU-6 — La **edad** coincide con la real (cumpleaños ya pasado y aún por venir).
+- [ ] A.4 — Ningún error ni *warning* nuevo en consola al operar.
 
 ## Entregables del ejercicio
 
-1. **7 fichas de defecto** (una por error + reto) con la plantilla de arriba.
-2. **`js/app.js` corregido**, con un commit por defecto y mensaje claro
-   (`fix: <qué> — causa raíz: <por qué>`).
-3. **Media cuartilla de mejora de proceso:** de las 7 causas raíz, ¿qué **3
-   prácticas** (linter, revisión de código, pruebas, convenciones, prueba de
-   humo) habrían evitado más de la mitad de los defectos? Justifica.
+1. **Lista de hallazgos** `H-01…H-0n` (salida del Procedimiento A) con el guion
+   de pruebas A.2/A.3 lleno: dato usado, resultado esperado y obtenido.
+2. **Tabla de triage** (Procedimiento B): cada hallazgo con severidad, momento
+   en que ocurre y tipo de evidencia; ordenados por ataque.
+3. **Registro de defectos** (una fila por defecto, formato del instrumento de
+   registro): síntoma → defecto (`archivo:línea`) → causa raíz → corrección →
+   verificación (caso + regresión) → prevención → ISO/IEC 25010.
+4. **`js/app.js` corregido**, un commit por defecto:
+   `fix: <qué cambió> — causa raíz: <por qué pasó>`.
+5. **Media cuartilla de mejora de proceso:** de las 7 causas raíz, ¿qué **3
+   prácticas** (linter, revisión de código, pruebas automatizadas, convenciones,
+   prueba de humo) habrían evitado más de la mitad de los defectos? Justifica.
 
 ## Resumen para el docente
 
