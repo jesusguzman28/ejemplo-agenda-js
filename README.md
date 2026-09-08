@@ -80,14 +80,32 @@ Instala la extensión **Live Server**, clic derecho sobre `index.html`
 
 ## Cómo trabajar el ejercicio
 
+No se evalúa que “arregles el código” (eso es lo fácil), sino que apliques
+**siempre el mismo método** para atacar un defecto y lo dejes **documentado**.
+Ese método está explicado en [`docs/GUIA_CORRECCION.md`](docs/GUIA_CORRECCION.md)
+→ sección *“Cómo atacar un defecto”* (ciclo Reproducir → Aislar → Hipótesis →
+Verificar → Corregir → Probar, distinción síntoma / defecto / causa raíz, y la
+**ficha de defecto** que llenas una por error).
+
 1. Levanta el proyecto (arriba).
-2. Abre las **DevTools** del navegador con `F12` → pestaña **Console**.
-3. Intenta usar la app: agregar un contacto, recargar, buscar, eliminar.
-4. Anota cada síntoma que observes.
-5. Abre [`docs/GUIA_CORRECCION.md`](docs/GUIA_CORRECCION.md) y, para cada
-   síntoma, **primero escribe tu diagnóstico** y recién después revela y aplica
-   la corrección.
-6. Vuelve a probar tras cada arreglo: un error suele tapar al siguiente.
+2. Abre las **DevTools** con `F12` → pestaña **Console** (déjala abierta).
+3. Usa la app tratando de **reproducir** cada fallo a voluntad: agregar, recargar,
+   buscar, eliminar, poner fecha de nacimiento.
+4. Por cada fallo, empieza una **ficha de defecto** con los pasos exactos y la
+   evidencia (texto de consola, captura).
+5. Escribe **tu diagnóstico** (la causa, no el síntoma) **antes** de abrir el
+   bloque *“Ver diagnóstico”* de la guía; luego compara.
+6. Aplica la **corrección mínima**, y completa la ficha con *causa raíz* y
+   *prevención* (bloque *“Cierre del defecto”* de la guía).
+7. Vuelve a probar **toda** la lista del checklist, no solo lo último: un arreglo
+   puede romper otra cosa (no regresión).
+
+### Entregables
+
+1. **7 fichas de defecto** (6 errores + 1 reto).
+2. **`js/app.js` corregido**, un commit por defecto (`fix: … — causa raíz: …`).
+3. **Media cuartilla:** qué 3 prácticas habrían evitado más de la mitad de los
+   defectos (ver la guía).
 
 ## Cómo saber que quedó correcto
 
